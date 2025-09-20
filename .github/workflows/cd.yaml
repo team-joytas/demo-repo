@@ -15,7 +15,7 @@ jobs:
       - name: 리포지토리 체크아웃
         uses: actions/checkout@v3
         with:
-          repository: ${{ secrets.ORG_GITOPS_REPOSITORY }} # team-joytas/wooco-gitops
+          repository: ${{ vars.ORG_GITOPS_REPOSITORY }} # team-joytas/wooco-gitops
           token: ${{ secrets.ORG_GITOPS_PAT }}
 
       - name: 이미지 버전 변경 # kustomize cli 대신 yq 사용
@@ -25,7 +25,7 @@ jobs:
             yq -i
             '.spec.template.spec.containers[0].image =
             "${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ github.event.release.tag_name }}"'
-            ./${{ secrets.GITOPS_DEPLOYMENT_YAML_PATH }}
+            ./${{ vars.ORG_GITOPS_PROD_DEPLOYMENT_PATH }}
 
       # https://github.com/simonw/simonw/issues/11
       - name: 커밋 & 푸시
@@ -34,5 +34,5 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "release: Deploy ${{ github.event.release.tag_name }} wooco spring app"
-          git remote set-url origin https://${{ secrets.ORG_GITOPS_PAT }}@github.com/${{ secrets.ORG_GITOPS_REPOSITORY }}
+          git remote set-url origin https://${{ secrets.ORG_GITOPS_PAT }}@github.com/${{ vars.ORG_GITOPS_REPOSITORY }}
           git push --set-upstream origin HEAD
